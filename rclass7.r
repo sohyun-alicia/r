@@ -52,6 +52,18 @@ hist(iris$Sepal.Width)
 
 hist(iris$Sepal.Width, freq=FALSE)      # 확률 밀도 확인. 각 구간의 총합은 1
 
-# 품종별 꽃잎 길이의 평균
+# 막대 그래프 : 품종별 꽃잎 길이의 평균
 x <- aggregate(Petal.Length ~ Species, iris, mean)
 barplot(x$Petal.Length, names=x$Species)        # 막대 그래프 이름으로 품종 지정
+
+# 파이 차트(품종별 꽃잎 길이의 합이 전체 꽃입 길이에서 차지하는 정도)
+x <- aggregate(Petal.Length ~ Species, iris, sum)       # 품종별로 꽃잎 길이 합산
+pie(x$Petal.Length, labels=x$Species)                   # 품종 이름을 붙여 파이 그래프를 그림
+
+# 선그래프 그리기
+
+x <- tapply(iris$Petal.Length, iris$Petal.Width, mean)     # Petal.Width를 그룹으로 Petal.Length 평균을 구함
+x
+
+plot(x, type='o')
+
