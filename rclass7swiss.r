@@ -11,3 +11,5 @@ str(swiss)
 #  데이터 그리기
 
 plot(swiss$Fertility)
+
+ 
