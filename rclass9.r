@@ -163,9 +163,14 @@ my_first_cook <- order_info_r %>% mutate(reserv_month=substr(RESERV_NO, 1, 6)) %
 my_first_cook
 
 # quiz
-install.packages("tidyverse")
+install.packages("ggplot2")
 
-mpg <- as.data.frame(ggplot::mpg)
+mpg <- as.data.frame(ggplot2::mpg)
 
+mpg_a <- mpg %>% filter(displ <= 4)
+mpg_b <- mpg %>% filter(displ >= 5)
 
+mean(mpg_a$hwy)
+mean(mpg_b$hwy)
 
+mpg_audi <- mpg %>% filter(manufacturer == "audi")
