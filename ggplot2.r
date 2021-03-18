@@ -106,9 +106,52 @@ gg <- ggplot(df_pie_graph, aes(x="", y=amt_item, fill=product_name)) + geom_bar(
 gg
 
 # 자동으로 파이 차트에 팔레트 색상 채우기(scale_fill_brewer())
-gg <- gg+scale_fill_brewer(palette="Spectral")
+gg <- gg+scale_fill_brewer(palette="Oranges")
 gg
 
 # direction=-1 추가하면 색상 순서 반대로 
 gg <- gg+scale_fill_brewer(palette="Spectral", direction=-1)
 gg
+
+
+# 선 그래프 데이터 준비
+# 예약 번호 별로 매출 합계 구하기
+total_amt <- order_info_r %>% group_by(reserv_no) %>% summarise(amt_daily=sum(sales/1000)) %>% arrange(reserv_no)
+ 
+ total_amt
+
+#  선 그래프 그리기
+# 예약 번호 순서를 x축으로 해서 선 그래프 그리기
+ggplot(total_amt, aes(x=reserv_no, y=amt_daily, group=1)) + geom_line()
+
+# 월별 매출 선 그래프 그리기
+# 예약번호 1~6번째 자리 선택해서(월로 만듦) 그룹핑
+total_amt <- order_info_r %>% mutate(month=substr(reserv_no, 1, 6)) %>% group_by(month) %>% summarise(amt_monthly=sum(sales/1000))
+
+total_amt
+
+ggplot(total_amt, aes(x=month, y=amt_monthly, group=1)) + geom_line()
+
+# 선 그래프 꾸미기
+
+# 점 그리기
+ggplot(total_amt, aes(x=month, y=amt_monthly, group=1)) + geom_line() + geom_point()
+
+# 색상 및 레이블(텍스트 데이터) 추가
+ggplot(total_amt, aes(x=month, y=amt_monthly, group=1, label=amt_monthly)) + geom_line(color="red", size=1)+ geom_point(color="darkred", size=3) + geom_text(vjust=1.5, hjust=0.5)
+
+
+# ToothGrowth 자료 분석해보기
+tail(ToothGrowth)
+
+help(ToothGrowth)
+
+ #  ToothGrowth 데이터를 투여량별로 그룹화 > 표준편차, 평균
+df <- ToothGrowth %>% group_by(dose) %>% summarise(sd=sd(len), len=mean(len))  
+
+df
+
+# 투여량(dose)와 성장길이(len) 상관관계 선 그래프로 표현
+ggplot(df, aes(dose,len), group=1) + geom_line()
+
+ggplot(df, aes(dose,len), group=1) + geom_bar()
