@@ -154,4 +154,23 @@ df
 # 투여량(dose)와 성장길이(len) 상관관계 선 그래프로 표현
 ggplot(df, aes(dose,len), group=1) + geom_line()
 
-ggplot(df, aes(dose,len), group=1) + geom_bar()
+df2 <- ToothGrowth %>% group_by(dose, supp) %>% summarise(sd=sd(len), len=mean(len))
+
+dfname <- data.frame(a = character(), b = character())
+
+ggplot(df2, aes(dose, len)) + geom_line(aes(group=supp))
+
+ggplot(df2, aes(dose, len)) + geom_line(aes(group=supp, linetype=supp)) + geom_point(size=2)
+
+ggplot(df2, aes(dose, len)) + geom_line(aes(group=supp, linetype=supp)) + geom_point(size=2) + theme_classic()
+
+
+# -----------------------상자 그림 :데이터 분포 확인---------------------------#
+
+# 아이템 메뉴 이름 연결(조인)
+df_boxplot_graph <- inner_join(order_info_r, item_r, by="item_id")
+
+df_boxplot_graph
+
+# 상자 그림 그리기
+ggplot(df_boxplot_graph, aes(x=product_name, y=sales/1000)) + geom_boxplot(width=0.8, outlier.size=2, outlier.colour="red") + labs(title="메뉴아이템 상자그림", x="메뉴", y="매출")
