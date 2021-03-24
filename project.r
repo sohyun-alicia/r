@@ -115,9 +115,37 @@ loyalty_sum_data/total_sum_data
 # 귀무 가설 : 스테이크와 와인의 매출은 상관관계가 없다.
 # 대립 가설 : 스테이크와 와인의 매출은 상관관계가 있다.
 
-# 1. 데이터 처리 : 동시 주문 건 찾기
+# 1-1. 데이터 처리 : 동시 주문 건 찾기
 # reserv_no를 키로, 예약, 주문 테이블 연결
 df_f_join_1 <- inner_join(reservation_r, order_info_r, by="reserv_no")
 
 # item_id를 키로, df_f_join_1과 메뉴 정보 테이블 연결
 df_f_join_2 <- inner_join(df_f_join_1, item_r, by="item_id")
+
+target_item <- c("M0005", "M0009")          # 스테이크와 와인
+
+# 스테이크와 메뉴 아이템 동시 주문 여부 확인
+df_stime_order <- df_f_join_2 %>% filter((item_id %in% target_item)) %>% group_by(reserv_no) %>% mutate(order_cnt=n()) %>% distinct(branch, reserv_no, order_cnt) %>% filter(order_cnt==2) %>% arrange(branch)
+
+# 동시 주문한 경우의 예약번호 데이터셋
+df_stime_order
+
+# 1-2. 데이터 처리 : 메뉴 아이템별 매출 계산
+# 동시 주문한 예약 번호만 담는 stime_order 변수 생성
+stime_order_rsv_no <- df_stime_order$reserv_no
+
+# 동시 주문 예약 번호이면서 스테이크와 와인일 경우만 선택
+df_stime_sales <- df_f_join_2 %>% filter((reserv_no %in% stime_order_rsv_no) & (item_id %in% target_item)) %>% group_by(reserv_no, product_name) %>% summarise(sales_amt=sum(sales)/1000) %>% arrange(product_name, reserv_no)
+
+# 동시 주문 12건이므로 매출 합계 24개 생성(스테이크+와인)
+df_stime_sales
+
+
+steak <- df_stime_sales %>% filter(product_name=="STEAK")   # 스테이크 정보만 담음
+wine <- df_stime_sales %>% filter(product_name=="WINE")     # 와인 정보만 담음
+
+# 데이터 그리기
+plot(steak$sales_amt, wine$sales_amt)
+
+# 상관 분석하기
+cor.test(steak$sales_amt, wine$sales_amt)
